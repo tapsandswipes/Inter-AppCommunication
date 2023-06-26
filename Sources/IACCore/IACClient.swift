@@ -36,4 +36,24 @@ extension IACClient {
             try IACManager.shared.sendRequest(request)
         }
     }
+
+    @discardableResult
+    func performAction(_ action: String, parameters: IACParameters? = nil) async throws -> IACAsyncResult {
+        try await withCheckedThrowingContinuation { continuation in
+            do {
+                try performAction(action, parameters: parameters) {
+                    switch $0 {
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
+                    case .cancelled:
+                        continuation.resume(returning: .cancelled)
+                    case .success(let result):
+                        continuation.resume(returning: .success(result))
+                    }
+                }
+            } catch {
+                continuation.resume(throwing: error)
+            }
+        }
+    }
 }

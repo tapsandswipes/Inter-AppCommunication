@@ -4,13 +4,19 @@ public typealias IACParameters = Dictionary<String, String>
 public typealias IACResultData = Dictionary<String, String>
 
 public
-enum IACResult {
+enum IACResult: Sendable {
     case success(IACResultData)
     case failure(NSError)
     case cancelled
 }
 
 public typealias IACResultHandler = (IACResult) -> Void
+
+public
+enum IACAsyncResult: Sendable {
+    case success(IACResultData)
+    case cancelled
+}
 
 public
 enum IACError: Int, Error {
@@ -41,7 +47,7 @@ let kIACRequest       = "IACRequestID"
 let kIACResponseType = "IACResponseType"
 let kIACErrorDomain  = "errorDomain"
 
-enum IACResponseType: Int {
+enum IACResponseType: Int, Sendable {
     case success
     case failure
     case cancel

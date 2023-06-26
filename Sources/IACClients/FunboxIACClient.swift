@@ -44,4 +44,18 @@ extension FunboxIACClient {
     func downloadSoundFromUrl(_ url: URL) {
         try? performAction("dounload", parameters: ["url": url.absoluteString])
     }
+
+    func playSound(_ sound: String) async throws -> Bool {
+        let result = try await performAction("play", parameters: ["sound": sound])
+        if case .cancelled = result {
+            return false
+        } else {
+            return true
+        }
+    }
+
+    func downloadSoundFromUrl(_ url: URL) async throws {
+        try await performAction("dounload", parameters: ["url": url.absoluteString])
+    }
+
 }

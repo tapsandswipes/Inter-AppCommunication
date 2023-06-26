@@ -34,4 +34,13 @@ extension InstapaperIACClient {
             callback?(.failure(error))
         }
     }
+
+    func addUrl(_ url: URL) async throws -> Bool {
+        let result = try await performAction("add", parameters: ["url": url.absoluteString])
+        if case .cancelled = result {
+            return false
+        } else {
+            return true
+        }
+    }
 }

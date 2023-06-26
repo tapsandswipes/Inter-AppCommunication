@@ -14,8 +14,8 @@ class IACManager {
         self.callbackURLScheme = callbackURLScheme
     }
 
-    private var sessions: [String: IACRequest] = [:]
-    private var actions: [String: IACActionHandler] = [:]
+    private var pendingRequests: [String: IACRequest] = [:]
+    private var actionsHandlers: [String: IACActionHandler] = [:]
 
     // Useful for testing
     var openURL = open(_:)
@@ -36,7 +36,7 @@ extension IACManager {
             return handleResponse(for: parameters)
         }
 
-        if let actionHandler = actions[action] {
+        if let actionHandler = actionsHandlers[action] {
             actionHandler(parameters?.removingProtocolParams()) {
                 self.handleResult($0, parameters: parameters)
             }
@@ -65,7 +65,7 @@ extension IACManager {
     }
 
     func handleAction(_ action: String, with handler: @escaping IACActionHandler) {
-        actions[action] = handler
+        actionsHandlers[action] = handler
     }
 
     func sendRequest(_ request: IACRequest) throws {
@@ -112,7 +112,7 @@ extension IACManager {
 
         guard let url = requestComponents.url else { throw IACError.invalidURL }
 
-        sessions[request.id] = request
+        pendingRequests[request.id] = request
 
         openURL(url)
     }
@@ -124,14 +124,14 @@ extension IACManager {
         guard
             let parameters = parameters,
             let id = parameters[kIACRequest],
-            let request = sessions[id]
+            let request = pendingRequests[id]
         else { return false }
 
         guard
             let responseValue = parameters[kIACResponseType].flatMap(Int.init),
             let responsetype = IACResponseType(rawValue: responseValue)
         else {
-            sessions.removeValue(forKey: id)
+            pendingRequests.removeValue(forKey: id)
             return false
         }
 
@@ -147,7 +147,7 @@ extension IACManager {
             request.handler?(.cancelled)
         }
 
-        sessions.removeValue(forKey: id)
+        pendingRequests.removeValue(forKey: id)
         return true
     }
 

@@ -39,4 +39,19 @@ extension GoogleChromeIACClient {
             callback?(.failure(error))
         }
     }
+
+    func openURL(_ url: URL, inNewTab: Bool = false) async throws -> Bool {
+        var params: IACParameters = ["url": url.absoluteString]
+        if inNewTab {
+            params["create-new-tab"] = ""
+        }
+
+        let result = try await performAction("open", parameters: params)
+        if case .cancelled = result {
+            return false
+        } else {
+            return true
+        }
+
+    }
 }
