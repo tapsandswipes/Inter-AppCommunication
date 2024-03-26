@@ -36,6 +36,12 @@ func appName() -> String {
     if let appName = Bundle.main.localizedInfoDictionary?["CFBundleDisplayName"] as? String {
         return appName
     }
+    else if let appName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String {
+        return appName
+    }
+    else if let appName = Bundle.main.infoDictionary?["CFBundleName"] as? String {
+        return appName
+    }
     return Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? "IAC"
 }
 
