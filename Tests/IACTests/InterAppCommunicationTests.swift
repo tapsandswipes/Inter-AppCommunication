@@ -5,6 +5,7 @@ final class InterAppCommunicationTests: XCTestCase {
 
     let client: IACClient = IACClient(scheme: "testScheme")
     let opener = URLOpener()
+    let appName: String = IACCore.appName()
 
     override func setUp() {
         client.canOpenURL = { _ in true }
@@ -15,7 +16,7 @@ final class InterAppCommunicationTests: XCTestCase {
 
         let url = try XCTUnwrap(sut.urlComponents().url)
 
-        XCTAssertEqual(url.absoluteString, "testScheme://x-callback-url/testRequest?x-source=IAC")
+        XCTAssertEqual(url.absoluteString, "testScheme://x-callback-url/testRequest?x-source=\(appName)")
     }
 
     func testRequestWithParams() throws {
@@ -30,7 +31,7 @@ final class InterAppCommunicationTests: XCTestCase {
         XCTAssertEqual(c.host, "x-callback-url")
         XCTAssertEqual(c.path.dropFirst(), "testRequest")
         XCTAssertEqual(c.queryItems?.count, 3)
-        try XCTAssertEqual(XCTUnwrap(c.queryItems?.first(where: { $0.name == "x-source"})).value, "IAC")
+        try XCTAssertEqual(XCTUnwrap(c.queryItems?.first(where: { $0.name == "x-source"})).value, appName)
         try XCTAssertEqual(XCTUnwrap(c.queryItems?.first(where: { $0.name == "p1"})).value, "v1")
         try XCTAssertEqual(XCTUnwrap(c.queryItems?.first(where: { $0.name == "p2"})).value, "v2")
     }
@@ -41,11 +42,11 @@ final class InterAppCommunicationTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         sut.handleAction("action") { p, cb in
-            XCTAssertEqual(p?["x-source"], "IAC")
+            XCTAssertEqual(p?["x-source"], self.appName)
             expectation.fulfill()
         }
 
-        let url = try XCTUnwrap(URL(string: "testScheme://x-callback-url/action?x-source=IAC"))
+        let url = try XCTUnwrap(URL(string: "testScheme://x-callback-url/action?x-source=\(appName)"))
 
         let r = sut.handleOpenURL(url)
 
@@ -61,12 +62,12 @@ final class InterAppCommunicationTests: XCTestCase {
 
         sut.handleAction("action") { p, cb in
             expectation.fulfill()
-            XCTAssertEqual(p?["x-source"], "IAC")
+            XCTAssertEqual(p?["x-source"], self.appName)
             XCTAssertEqual(p?["p1"], "v1")
             XCTAssertEqual(p?["p2"], "v2")
         }
 
-        let url = try XCTUnwrap(URL(string: "testScheme://x-callback-url/action?x-source=IAC&p1=v1&p2=v2"))
+        let url = try XCTUnwrap(URL(string: "testScheme://x-callback-url/action?x-source=\(appName)&p1=v1&p2=v2"))
 
         let r = sut.handleOpenURL(url)
 
@@ -83,7 +84,7 @@ final class InterAppCommunicationTests: XCTestCase {
 
         try sut.sendRequest(request)
 
-        XCTAssertEqual(opener.lastOpenedURL?.absoluteString, "testScheme://x-callback-url/testRequest?x-source=IAC")
+        XCTAssertEqual(opener.lastOpenedURL?.absoluteString, "testScheme://x-callback-url/testRequest?x-source=\(appName)")
     }
 
     func testManagerCallbacks() throws {
