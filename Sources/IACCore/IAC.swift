@@ -26,7 +26,7 @@ enum IACError: Int, Error {
     case invalidURL
 }
 
-public typealias IACActionHandler = (IACParameters?, IACResultHandler) -> Void
+public typealias IACActionHandler = (IACParameters?, @escaping IACResultHandler) -> Void
 
 public let IACErrorDomain        = "com.iac.manager.error"
 public let IACClientErrorDomain = "com.iac.client.error"
