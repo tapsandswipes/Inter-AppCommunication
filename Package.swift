@@ -4,7 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "Inter-AppCommunication",
-    platforms: [.iOS(.v13), .macOS(.v10_13), .tvOS(.v13)],
+    platforms: [.iOS(.v13), .macOS(.v10_15), .tvOS(.v13)],
     products: [
         .library(name: "IACCore", targets: ["IACCore"]),
         .library(name: "IACClients", targets: ["IACClients"]),
