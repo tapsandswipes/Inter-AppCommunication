@@ -1,8 +1,8 @@
 import Foundation
-#if os(iOS) || os(tvOS)
-import class UIKit.UIApplication
-#elseif os(OSX)
+#if os(OSX)
 import class AppKit.NSWorkspace
+#else
+import class UIKit.UIApplication
 #endif
 
 
@@ -46,18 +46,18 @@ func appName() -> String {
 }
 
 func open(_ url: URL) {
-#if os(iOS) || os(tvOS)
-    UIApplication.shared.open(url)
-#elseif os(OSX)
+#if os(OSX)
     NSWorkspace.shared.open(url)
+#else
+    UIApplication.shared.open(url)
 #endif
 }
 
 func canOpen(_ url: URL) -> Bool {
-#if os(iOS) || os(tvOS)
-    return UIApplication.shared.canOpenURL(url)
-#elseif os(OSX)
+#if os(OSX)
     return NSWorkspace.shared.urlForApplication(toOpen: url) != nil
+#else
+    return UIApplication.shared.canOpenURL(url)
 #endif
 }
 
